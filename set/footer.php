@@ -1,5 +1,5 @@
                 <footer class="py-3 bg-light mt-auto">
-                    <div class="container-fluid">
+                    <div class="container">
                         <div class="d-flex align-items-center justify-content-between small">
                             <div class="text-muted">Copyright &copy; EACII 2021</div>
                             <div>

@@ -5,7 +5,7 @@ if (!isset($_SESSION['otro'])) {
     exit();
 }
 include '../../../set/conexion.php';
-$id_contrato = isset($_POST['det_contrato']) ? $_POST['det_contrato'] : exit('Acción no permitida');
+$id_contrato = isset($_POST['det_super']) ? $_POST['det_super'] : exit('Acción no permitida');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -20,27 +20,29 @@ $id_contrato = isset($_POST['det_contrato']) ? $_POST['det_contrato'] : exit('Ac
                     <div class="card mb-5 mb-4">
                         <div class="card-header" id="divTituloPag">
                             <div class="row">
-                                <div class="col-md-12">
-                                    <i class="fas fa-tasks fa-lg" style="color: #07CF74;"></i>
-                                    <div id="id_contrato_d"></div>
-                                    DOCUMENTOS SOPORTE CONTRATO
+                                <div class="input-group col-md-12">
+                                    <div class="div-icono">
+                                        <span class="fas fa-user-secret fa-lg" style="color: #2C3E50;"></span>
+                                    </div>
+                                    <div>
+                                        DOCUMENTOS SOPORTE CONTRATO
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body" id="divCuerpoPag" style="min-height: 73vh;">
-                            <input type="hidden" id="id_ct" value="<?php echo $id_contrato ?>">
+                            <input type="hidden" id="id_cont_super" value="<?php echo $id_contrato ?>">
                             <div class="table-responsive">
-                                <table id="tableDocSopContrato" class="table table-striped table-bordered table-sm nowrap table-hover shadow" style="width:100%">
+                                <table id="tableDocsContratoSupervisar" class="table table-striped table-bordered table-sm nowrap table-hover shadow" style="width:100%">
                                     <thead>
                                         <tr class="text-center">
                                             <th>#</th>
                                             <th>Documento</th>
                                             <th>Archivo</th>
                                             <th>Estado</th>
-                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="modificarDocSopContrato">
+                                    <tbody id="modificarDocsContratoSupervisar">
                                     </tbody>
                                 </table>
                             </div>

@@ -28,7 +28,7 @@
         $.ajax({
             type: 'POST',
             dataType: 'json',
-            url: 'eliminar/conf_del.php',
+            url: window.urlin + '/terceros/gestion/eliminar/conf_del.php',
             data: { id: i, tip: t }
         }).done(function(res) {
             $('#divModalConfDel').modal('show');
@@ -114,7 +114,7 @@
             dom: setdom,
             buttons: [{
                 action: function(e, dt, node, config) {
-                    $.post("../datos/registrar/formadd_doc_soporte_c.php", function(he) {
+                    $.post("../datos/registrar/formadd_doc_soporte_c.php", { id_contr: id_contr }, function(he) {
                         $('#divTamModalForms').removeClass('modal-xl');
                         $('#divTamModalForms').removeClass('modal-sm');
                         $('#divTamModalForms').addClass('modal-lg');
@@ -135,6 +135,7 @@
                 { 'data': 'num' },
                 { 'data': 'doc' },
                 { 'data': 'archivo' },
+                { 'data': 'estado' },
                 { 'data': 'botones' },
             ],
             "order": [
@@ -214,6 +215,28 @@
         });
         $('.bttn-plus-dt span').html('<span class="icon-dt fas fa-plus-circle fa-lg"></span>');
         $('#tableDocumento').wrap('<div class="overflow" />');
+        //dataTable Documentos tercero
+        let id_con_super = $('#id_cont_super').val();
+        $('#tableDocsContratoSupervisar').DataTable({
+            language: setIdioma,
+            "ajax": {
+                url: '../datos/listar/datos_docs_contrato_supervisar.php',
+                type: 'POST',
+                data: { id_con_super: id_con_super },
+                dataType: 'json',
+            },
+            "columns": [
+                { 'data': 'num' },
+                { 'data': 'doc' },
+                { 'data': 'archivo' },
+                { 'data': 'estado' },
+            ],
+            "order": [
+                [0, "asc"]
+            ],
+
+        });
+        $('#tableDocsContratoSupervisar').wrap('<div class="overflow" />');
         //dataTable Cotizaciones
         $('.tableCotizaciones').DataTable({
             language: setIdioma,
@@ -241,6 +264,15 @@
 
         });
         $('#tableDetalleCotiza').wrap('<div class="overflow" />');
+        //dataTable detalles Cotizaciones
+        $('#tableSupervision').DataTable({
+            language: setIdioma,
+            "order": [
+                [0, "asc"]
+            ],
+
+        });
+        $('#tableSupervision').wrap('<div class="overflow" />');
     });
     $('.cambiar').on('click', function() {
         if ($(this).hasClass('fa-eye')) {
@@ -688,7 +720,7 @@
             dataType: 'json',
             data: { id_doc: id_doc },
             success: function(r) {
-                if (r === '0') {
+                if (r == '0') {
                     alert('Archivo no disponible');
                 } else {
                     let a = document.createElement("a");
@@ -702,8 +734,32 @@
         return false;
     });
     $('#modificarDocSopContrato').on('click', '.descargar', function() {
-        let ruta = $(this).attr('value');
-        let tipo = 'cc';
+        let data = $(this).attr('value').split('|');
+        let ruta = data[0];
+        let tipo = data[1];
+        $.ajax({
+            type: 'POST',
+            url: '../datos/descargas/descarga_docs_soporte_contrato.php',
+            dataType: 'json',
+            data: { ruta: ruta },
+            success: function(r) {
+                if (r == 0) {
+                    alert('Archivo no disponible');
+                } else {
+                    let a = document.createElement("a");
+                    a.href = "data:application/pdf;base64," + r['file'];
+                    a.download = tipo + ".pdf";
+                    a.click();
+                }
+
+            }
+        });
+        return false;
+    });
+    $('#tableDocsContratoSupervisar').on('click', '.descargar', function() {
+        let data = $(this).attr('value').split('|');
+        let ruta = data[0];
+        let tipo = data[1];
         $.ajax({
             type: 'POST',
             url: '../datos/descargas/descarga_docs_soporte_contrato.php',
@@ -845,6 +901,150 @@
         let datos = $(this).attr('value');
         $('<form action="contratos/detalles_contratos.php" method="post"><input type="hidden" name="det_contrato" value="' + datos + '" /></form>').appendTo('body').submit();
     });
+    //mostrar otro cual?
+    $('#divModalForms').on('change', '#slcTipoDoc', function() {
+        if ($(this).val() == 99) {
+            $('#divCual').show();
+        } else {
+            $('#divCual').hide();
+        }
+        return false;
+    });
+    //adjuntar documentos soporte de contrato
+    $('#divModalForms').on('click', '#btnDocsSoporteC', function() {
+        if ($('#slcTipoDoc').val() == 0) {
+            $('#divModalError').modal('show');
+            $('#divMsgError').html('¡Debe selecionar un tipo de documento!');
+        } else if ($('#fileDocCt').val() == '') {
+            $('#divModalError').modal('show');
+            $('#divMsgError').html('¡Debe elegir un archivo!');
+        } else {
+            let archivo = $('#fileDocCt').val();
+            let ext = archivo.substring(archivo.lastIndexOf(".")).toLowerCase();
+            if (ext != '.pdf') {
+                $('#divModalError').modal('show');
+                $('#divMsgError').html('¡Solo se permite documentos .pdf!');
+            } else if ($('#fileDocCt')[0].files[0].size > 2097152) {
+                $('#divModalError').modal('show');
+                $('#divMsgError').html('¡Documento debe tener un tamaño menor a 2Mb!');
+            } else if ($('#slcTipoDoc').val() == 99 && $('#txtCual').val() == '') {
+                $('#divModalError').modal('show');
+                $('#divMsgError').html('Debe escribir el tipo de documento');
+            } else {
+                let datos = new FormData();
+                datos.append('id_contrato_d', $('#id_devuelto').prop('value'));
+                datos.append('slcTipoDoc', $('#slcTipoDoc').prop('value'));
+                datos.append('txtCual', $('#txtCual').prop('value'));
+                datos.append('fileDocCt', $('#fileDocCt')[0].files[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '../registrar/new_doc_soporte.php',
+                    contentType: false,
+                    data: datos,
+                    processData: false,
+                    cache: false,
+                    success: function(r) {
+                        if (r == 1) {
+                            let id = 'tableDocSopContrato';
+                            reloadtable(id);
+                            $('#divModalForms').modal('hide');
+                            $('#divModalDone').modal('show');
+                            $('#divMsgDone').html('Documento de soporte adjuntado Correctamente');
+                        } else {
+                            $('#divModalError').modal('show');
+                            $('#divMsgError').html(r);
+                        }
+                    }
+                });
+            }
+        }
+        return false;
+    });
+    //actualizar documento soporte de contrato
+    $('#tableDocSopContrato').on('click', '.editar', function() {
+        let id = $(this).attr('value');
+        $.post("../datos/actualizar/up_docs_soporte_c.php", { id: id }, function(he) {
+            $('#divTamModalForms').removeClass('modal-xl');
+            $('#divTamModalForms').removeClass('modal-sm');
+            $('#divTamModalForms').addClass('modal-lg');
+            $('#divModalForms').modal('show');
+            $("#divForms").html(he);
+        });
+    });
+    //Actualizar documentos soporte de contrato
+    $('#divModalForms').on('click', '#btnUpDocsSoporteC', function() {
+        if ($('#slcTipoDoc').val() == 99 && $('#txtCual').val() == '') {
+            $('#divModalError').modal('show');
+            $('#divMsgError').html('Debe escribir el tipo de documento');
+        } else {
+            let datos = new FormData();
+            if ($('#fileDocCt').val() != '') {
+                let archivo = $('#fileDocCt').val();
+                let ext = archivo.substring(archivo.lastIndexOf(".")).toLowerCase();
+                if (ext != '.pdf') {
+                    $('#divModalError').modal('show');
+                    $('#divMsgError').html('¡Solo se permite documentos .pdf!');
+                    return false;
+                } else if ($('#fileDocCt')[0].files[0].size > 2097152) {
+                    $('#divModalError').modal('show');
+                    $('#divMsgError').html('¡Documento debe tener un tamaño menor a 2Mb!');
+                    return false;
+                }
+                datos.append('fileDocCt', $('#fileDocCt')[0].files[0]);
+            }
+            datos.append('id_doc', $('#id_documento').prop('value'));
+            datos.append('slcTipoDoc', $('#slcTipoDoc').prop('value'));
+            datos.append('txtCual', $('#txtCual').prop('value'));
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: '../actualizar/up_doc_soporte_c.php',
+                contentType: false,
+                data: datos,
+                processData: false,
+                cache: false,
+            }).done(function(r) {
+                if (r.estado == 1) {
+                    let id = 'tableDocSopContrato';
+                    reloadtable(id);
+                    $('#divModalForms').modal('hide');
+                    $('#divModalDone').modal('show');
+                    $('#divMsgDone').html(r.response);
+                } else {
+                    $('#divModalError').modal('show');
+                    $('#divMsgError').html(r.response);
+                }
+            });
+
+        }
+        return false;
+    });
+    //eliminar documento soporte de contrato
+    $('#tableDocSopContrato').on('click', '.borrar', function() {
+        let id = $(this).attr('value');
+        let tip = 'DocSoporteC';
+        confdel(id, tip);
+    });
+    $("#divBtnsModalDel").on('click', '#btnConfirDelDocSoporteC', function() {
+        $('#divModalConfDel').modal('hide');
+        $.ajax({
+            type: 'POST',
+            url: '../eliminar/del_docs_soporte_c.php',
+            data: {},
+            success: function(r) {
+                if (r == '1') {
+                    let id = 'tableDocSopContrato';
+                    reloadtable(id);
+                    $('#divModalDone').modal('show');
+                    $('#divMsgDone').html("Documento de soporte eliminado correctamente");
+                } else {
+                    $('#divModalError').modal('show');
+                    $('#divMsgError').html(r);
+                }
+            }
+        });
+        return false;
+    });
     //Verificar campos vacios;
     var camposVacios = function(f, t) {
         let r = true;
@@ -859,4 +1059,48 @@
         });
         return r;
     };
+    $('#modificarSupervisiones').on('click', '.detalle', function() {
+        let datos = $(this).attr('value');
+        $('<form action="supervision/detalles_contratos_supervisar.php" method="post"><input type="hidden" name="det_super" value="' + datos + '" /></form>').appendTo('body').submit();
+    });
+    var cambiaEstado = function(id, estado) {
+        $.ajax({
+            type: 'POST',
+            url: '../datos/actualizar/up_estado_doc_soporte.php',
+            data: { id: id, estado: estado },
+            success: function(r) {
+                if (r == 1) {
+                    let id_t = 'tableDocsContratoSupervisar';
+                    reloadtable(id_t);
+                } else {
+                    $('#divModalError').modal('show');
+                    $('#divMsgError').html(r);
+                }
+
+            }
+        });
+    };
+    $('#modificarDocsContratoSupervisar').on('click', '.aprobar', function() {
+        let id = $(this).attr('value');
+        let estado = '2';
+        cambiaEstado(id, estado);
+        return false;
+    });
+    $('#modificarDocsContratoSupervisar').on('click', '.rechazar', function() {
+        let id = $(this).attr('value');
+        let estado = '3';
+        cambiaEstado(id, estado);
+        return false;
+    });
+    $('#tableDocsContratoSupervisar').on('click', '#btnDevActaDesigSuperv', function() {
+        let id_contr = $(this).attr('value');
+        $.post("../datos/registrar/formadd_doc_soporte_c.php", { id_contr: id_contr }, function(he) {
+            $('#divTamModalForms').removeClass('modal-xl');
+            $('#divTamModalForms').removeClass('modal-sm');
+            $('#divTamModalForms').addClass('modal-lg');
+            $('#divModalForms').modal('show');
+            $("#divForms").html(he);
+            $('#slcRespEcon').focus();
+        });
+    });
 })(jQuery);

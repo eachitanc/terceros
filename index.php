@@ -9,7 +9,7 @@ include 'set/conexion.php';
 include 'set/head.php';
 ?>
 
-<body class="sb-nav-fixed">
+<body class="sb-nav-fixed sb-sidenav-toggled">
     <div id="divFondo" class="container-fluid">
         <div class="row justify-content-center align-items-center minh-100">
             <div class="center-block">

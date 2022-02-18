@@ -59,19 +59,29 @@ $result = curl_exec($ch);
 curl_close($ch);
 $empxtercero = json_decode($result, true);
 
+//API URL
+$url = $api . 'terceros/datos/res/listar/contratos_supervisar/' . $id_terc;
+$ch = curl_init($url);
+//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$result = curl_exec($ch);
+curl_close($ch);
+$contrato_supervisar = json_decode($result, true);
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <?php include '../../set/head.php' ?>
 
-<body class="sb-nav-fixed">
+<body class="sb-nav-fixed sb-sidenav-toggled">
     <?php include '../../set/navsuperior.php' ?>
     <script type="text/javascript" src="/terceros/js/jquery.min.js"></script>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid p-0">
-                    <div class="card mb-4">
+                    <div class="card mb-5 mb-4">
                         <div class="card-header" id="divTituloPag">
                             <div class="row">
                                 <div class="col-md-12">
@@ -175,7 +185,7 @@ $empxtercero = json_decode($result, true);
                                                         <span class="fas fa-city fa-lg" style="color: #2ECC71;"></span>
                                                     </div>
                                                     <div>
-                                                        EMPRESAS
+                                                        EMPRESAS : COTIZACIONES, CONTRATOS
                                                     </div>
                                                     <div class="ml-auto mr-0 mr-md-3 my-2 my-md-0 con-icon" id="notif_gral">
 
@@ -189,296 +199,358 @@ $empxtercero = json_decode($result, true);
                                         <div class="card-body">
                                             <div id="accordion">
                                                 <?php
-                                                foreach ($empxtercero as $ext) {
-                                                    $key = array_search($ext['nit'], array_column($empresas, 'nit'));
-                                                    if (false !== $key) {
-                                                        $id_empresa = $empresas[$key]['id_empresa'];
+                                                if (!empty($empxtercero)) {
+                                                    foreach ($empxtercero as $ext) {
+                                                        $key = array_search($ext['nit'], array_column($empresas, 'nit'));
+                                                        if (false !== $key) {
+                                                            $id_empresa = $empresas[$key]['id_empresa'];
                                                 ?>
-                                                        <!-- parte-->
-                                                        <div class="card">
-                                                            <div class="card-header card-header-detalles py-0 headings" id="<?php echo 'empresa' . $id_empresa ?>">
-                                                                <h5 class="mb-0">
-                                                                    <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseEmpresa<?php echo $id_empresa ?>" aria-expanded="true" aria-controls="collapseEmpresa<?php echo $id_empresa ?>">
-                                                                        <div class="form-row">
-                                                                            <div class="div-icono">
-                                                                                <span class="fas fa-building fa-lg" style="color: #EC7063;"></span>
-                                                                            </div>
-                                                                            <div>
-                                                                                <?php echo $empresas[$key]['nombre'] . ' ' . $empresas[$key]['nit'] . '-' . $empresas[$key]['dig_ver'] ?>
-                                                                            </div>
-                                                                            <div class="ml-auto mr-0 mr-md-3 my-2 my-md-0 con-icon" id="notif_cot">
+                                                            <!-- parte-->
+                                                            <div class="card">
+                                                                <div class="card-header card-header-detalles py-0 headings" id="<?php echo 'empresa' . $id_empresa ?>">
+                                                                    <h5 class="mb-0">
+                                                                        <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseEmpresa<?php echo $id_empresa ?>" aria-expanded="true" aria-controls="collapseEmpresa<?php echo $id_empresa ?>">
+                                                                            <div class="form-row">
+                                                                                <div class="div-icono">
+                                                                                    <span class="fas fa-building fa-lg" style="color: #EC7063;"></span>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <?php echo $empresas[$key]['nombre'] . ' ' . $empresas[$key]['nit'] . '-' . $empresas[$key]['dig_ver'] ?>
+                                                                                </div>
+                                                                                <div class="ml-auto mr-0 mr-md-3 my-2 my-md-0 con-icon" id="notif_cot">
 
-                                                                            </div>
-                                                                        </div>
-                                                                    </a>
-                                                                </h5>
-                                                            </div>
-                                                            <div id="collapseEmpresa<?php echo $id_empresa ?>" class="collapse" aria-labelledby="empresa<?php echo $id_empresa ?>">
-                                                                <div class="card-body">
-                                                                    <div id="accordion">
-                                                                        <!-- parte-->
-                                                                        <div class="card">
-                                                                            <div class="card-header card-header-detalles py-0 headings" id="<?php echo 'cotEmp' . $id_empresa ?>">
-                                                                                <h5 class="mb-0">
-                                                                                    <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseCotEmp<?php echo $id_empresa ?>" aria-expanded="true" aria-controls="collapseCotEmp<?php echo $id_empresa ?>">
-                                                                                        <div class="form-row">
-                                                                                            <div class="div-icono">
-                                                                                                <span class="fas fa-list-ul fa-lg" style="color: #F1C40F;"></span>
-                                                                                            </div>
-                                                                                            <div>
-                                                                                                COTIZACIONES
-                                                                                            </div>
-                                                                                            <?php
-                                                                                            //API URL
-                                                                                            $cotiz = $_SESSION['id_otro'] . '|' . $empresas[$key]['nit'];
-                                                                                            $url = $api . 'terceros/datos/res/listar/cotizaciones/' . $cotiz;
-                                                                                            $ch = curl_init($url);
-                                                                                            //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                                                                                            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-                                                                                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                                                                                            $result = curl_exec($ch);
-                                                                                            curl_close($ch);
-                                                                                            $cotizaciones = json_decode($result, true);
-                                                                                            $num_cot = 0;
-                                                                                            if ($cotizaciones != 0) {
-                                                                                                foreach ($cotizaciones as $cot) {
-                                                                                                    if ($cot['estado'] == 1) {
-                                                                                                        $num_cot++;
-                                                                                                    }
-                                                                                                }
-                                                                                            } ?>
-                                                                                            <div class="ml-auto mr-0 mr-md-3 my-2 my-md-0 con-icon">
-                                                                                                <span class="fas fa-bell<?php echo $num_cot == 0 ? '-slash' : '' ?> fa-lg" style="color:<?php echo $num_cot == 0 ? '#D5D8DC' : '#5DADE2' ?> ;"></span>
-                                                                                                <?php if ($num_cot > 0) { ?>
-                                                                                                    <script type="text/javascript">
-                                                                                                        var newSpan = document.createElement("span");
-                                                                                                        newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
-                                                                                                        newSpan.style.color = 'red';
-                                                                                                        newSpan.setAttribute('title', 'Nuevas cotizaciones');
-                                                                                                        var contenedor = document.getElementById("notif_gral");
-                                                                                                        contenedor.appendChild(newSpan);
-                                                                                                    </script>
-                                                                                                    <script type="text/javascript">
-                                                                                                        var newSpan = document.createElement("span");
-                                                                                                        newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
-                                                                                                        newSpan.style.color = 'red';
-                                                                                                        newSpan.setAttribute('title', 'Nuevas cotizaciones');
-                                                                                                        var contenedor = document.getElementById("notif_cot");
-                                                                                                        contenedor.appendChild(newSpan);
-                                                                                                    </script>
-                                                                                                    <div class="txt-over">
-                                                                                                        <?php echo $num_cot > 99 ? '99+' : $num_cot ?>
-                                                                                                    </div>
-                                                                                                <?php } ?>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </a>
-                                                                                </h5>
-                                                                            </div>
-                                                                            <div id="collapseCotEmp<?php echo $id_empresa ?>" class="collapse" aria-labelledby="cotEmp<?php echo $id_empresa ?>">
-                                                                                <div class="card-body">
-                                                                                    <?php
-                                                                                    if ($cotizaciones != 0) {
-                                                                                    ?>
-                                                                                        <table class="table table-striped table-bordered table-sm nowrap table-hover shadow tableCotizaciones" style="width:100%">
-                                                                                            <thead>
-                                                                                                <tr>
-                                                                                                    <th># Cotización</th>
-                                                                                                    <th>Descripción</th>
-                                                                                                    <th>Estado</th>
-                                                                                                    <th>Acciones</th>
-                                                                                                </tr>
-                                                                                            </thead>
-                                                                                            <tbody class="modificarCotizaciones">
-                                                                                                <?php
-                                                                                                foreach ($cotizaciones as $cot) {
-                                                                                                ?>
-                                                                                                    <tr>
-                                                                                                        <td>COT-<?php echo $cot['id_cot'] ?></td>
-                                                                                                        <td><?php echo $cot['objeto'] ?></td>
-                                                                                                        <?php
-                                                                                                        $btnDetalle = null;
-                                                                                                        $estad = 0;
-                                                                                                        $color_est = '';
-                                                                                                        switch ($cot['estado']) {
-                                                                                                            case 1:
-                                                                                                                $estad = 'PENDIENTE';
-                                                                                                                $btnDetalle = '<div class="center-block"><a value="' . $cotiz . '|' . $cot['id_cot'] . '|' . $cot['id_cot_ter'] . '" class="btn btn-outline-warning btn-sm btn-circle shadow-gb detalle" title="Detalles"><span class="fas fa-eye fa-lg"></span></a></div>';
-                                                                                                                $color_est = 'cell-orange';
-                                                                                                                break;
-                                                                                                            case 2:
-                                                                                                                $estad = 'ENVIADA';
-                                                                                                                $btnDetalle = '<div class="center-block"><a value="' . $cotiz . '|' . $cot['id_cot'] . '" class="btn btn-outline-info btn-sm btn-circle shadow-gb informacion" title="Información"><span class="fas fa-info fa-lg"></span></a></div>';
-                                                                                                                $color_est = 'cell-green';
-                                                                                                                break;
-                                                                                                        }
-                                                                                                        ?>
-                                                                                                        <td class="<?php echo $color_est ?>">
-                                                                                                            <?php echo $estad ?>
-                                                                                                        </td>
-                                                                                                        <td><?php echo $btnDetalle ?></td>
-                                                                                                    </tr>
-                                                                                                <?php
-                                                                                                }
-                                                                                                ?>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    <?php
-                                                                                    } else {
-                                                                                    ?>
-                                                                                        <div class="p-3 mb-2 bg-warning text-white">NO HAY COTIZACIONES DISPONIBLES</div>
-                                                                                    <?php
-                                                                                    }
-                                                                                    ?>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <!--parte-->
-                                                                        <div class="card">
-                                                                            <div class="card-header card-header-detalles py-0 headings" id="headingContrato">
-                                                                                <h5 class="mb-0">
-                                                                                    <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseContrato" aria-expanded="true" aria-controls="collapseContrato">
-                                                                                        <div class="form-row">
-                                                                                            <div class="div-icono">
-                                                                                                <span class="fas fa-file-signature fa-lg" style="color: #29B6F6;"></span>
+                                                                        </a>
+                                                                    </h5>
+                                                                </div>
+                                                                <div id="collapseEmpresa<?php echo $id_empresa ?>" class="collapse" aria-labelledby="empresa<?php echo $id_empresa ?>">
+                                                                    <div class="card-body">
+                                                                        <div id="accordion">
+                                                                            <!-- parte-->
+                                                                            <div class="card">
+                                                                                <div class="card-header card-header-detalles py-0 headings" id="<?php echo 'cotEmp' . $id_empresa ?>">
+                                                                                    <h5 class="mb-0">
+                                                                                        <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseCotEmp<?php echo $id_empresa ?>" aria-expanded="true" aria-controls="collapseCotEmp<?php echo $id_empresa ?>">
+                                                                                            <div class="form-row">
+                                                                                                <div class="div-icono">
+                                                                                                    <span class="fas fa-list-ul fa-lg" style="color: #F1C40F;"></span>
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    COTIZACIONES
+                                                                                                </div>
+                                                                                                <?php
+                                                                                                //API URL
+                                                                                                $cotiz = $_SESSION['id_otro'] . '|' . $empresas[$key]['nit'];
+                                                                                                $url = $api . 'terceros/datos/res/listar/cotizaciones/' . $cotiz;
+                                                                                                $ch = curl_init($url);
+                                                                                                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                                                                                                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                                                                                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                                                                                $result = curl_exec($ch);
+                                                                                                curl_close($ch);
+                                                                                                $cotizaciones = json_decode($result, true);
+                                                                                                $num_cot = 0;
+                                                                                                if ($cotizaciones != 0) {
+                                                                                                    foreach ($cotizaciones as $cot) {
+                                                                                                        if ($cot['estado'] == 1) {
+                                                                                                            $num_cot++;
+                                                                                                        }
+                                                                                                    }
+                                                                                                } ?>
+                                                                                                <div class="ml-auto mr-0 mr-md-3 my-2 my-md-0 con-icon">
+                                                                                                    <span class="fas fa-bell<?php echo $num_cot == 0 ? '-slash' : '' ?> fa-lg" style="color:<?php echo $num_cot == 0 ? '#D5D8DC' : '#5DADE2' ?> ;"></span>
+                                                                                                    <?php if ($num_cot > 0) { ?>
+                                                                                                        <script type="text/javascript">
+                                                                                                            var newSpan = document.createElement("span");
+                                                                                                            newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
+                                                                                                            newSpan.style.color = 'red';
+                                                                                                            newSpan.setAttribute('title', 'Nuevas cotizaciones');
+                                                                                                            var contenedor = document.getElementById("notif_gral");
+                                                                                                            contenedor.appendChild(newSpan);
+                                                                                                        </script>
+                                                                                                        <script type="text/javascript">
+                                                                                                            var newSpan = document.createElement("span");
+                                                                                                            newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
+                                                                                                            newSpan.style.color = 'red';
+                                                                                                            newSpan.setAttribute('title', 'Nuevas cotizaciones');
+                                                                                                            var contenedor = document.getElementById("notif_cot");
+                                                                                                            contenedor.appendChild(newSpan);
+                                                                                                        </script>
+                                                                                                        <div class="txt-over">
+                                                                                                            <?php echo $num_cot > 99 ? '99+' : $num_cot ?>
+                                                                                                        </div>
+                                                                                                    <?php } ?>
+                                                                                                </div>
                                                                                             </div>
-                                                                                            <div>
-                                                                                                2. CONTRATOS.
-                                                                                            </div>
-                                                                                            <?php
-                                                                                            //API URL
-                                                                                            $contra = $_SESSION['id_otro'] . '|' . $empresas[$key]['nit'];
-                                                                                            $url = $api . 'terceros/datos/res/listar/contratos/' . $contra;
-                                                                                            $ch = curl_init($url);
-                                                                                            //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                                                                                            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-                                                                                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                                                                                            $result = curl_exec($ch);
-                                                                                            curl_close($ch);
-                                                                                            $contratos = json_decode($result, true);
-                                                                                            $num_contr = 0;
-                                                                                            if ($contratos != 0) {
-                                                                                                foreach ($contratos as $ct) {
-                                                                                                    if ($ct['estado'] == 1) {
-                                                                                                        $num_contr++;
+                                                                                        </a>
+                                                                                    </h5>
+                                                                                </div>
+                                                                                <div id="collapseCotEmp<?php echo $id_empresa ?>" class="collapse" aria-labelledby="cotEmp<?php echo $id_empresa ?>">
+                                                                                    <div class="card-body">
+                                                                                        <?php
+                                                                                        if ($cotizaciones != 0) {
+                                                                                        ?>
+                                                                                            <table class="table table-striped table-bordered table-sm nowrap table-hover shadow tableCotizaciones" style="width:100%">
+                                                                                                <thead>
+                                                                                                    <tr>
+                                                                                                        <th># Cotización</th>
+                                                                                                        <th>Descripción</th>
+                                                                                                        <th>Estado</th>
+                                                                                                        <th>Acciones</th>
+                                                                                                    </tr>
+                                                                                                </thead>
+                                                                                                <tbody class="modificarCotizaciones">
+                                                                                                    <?php
+                                                                                                    foreach ($cotizaciones as $cot) {
+                                                                                                    ?>
+                                                                                                        <tr>
+                                                                                                            <td>COT-<?php echo $cot['id_cot'] ?></td>
+                                                                                                            <td><?php echo $cot['objeto'] ?></td>
+                                                                                                            <?php
+                                                                                                            $btnDetalle = null;
+                                                                                                            $estad = 0;
+                                                                                                            $color_est = '';
+                                                                                                            switch ($cot['estado']) {
+                                                                                                                case 1:
+                                                                                                                    $estad = 'PENDIENTE';
+                                                                                                                    $btnDetalle = '<div class="center-block"><a value="' . $cotiz . '|' . $cot['id_cot'] . '|' . $cot['id_cot_ter'] . '" class="btn btn-outline-warning btn-sm btn-circle shadow-gb detalle" title="Detalles"><span class="fas fa-eye fa-lg"></span></a></div>';
+                                                                                                                    $color_est = 'cell-orange';
+                                                                                                                    break;
+                                                                                                                case 2:
+                                                                                                                    $estad = 'ENVIADA';
+                                                                                                                    $btnDetalle = '<div class="center-block"><a value="' . $cotiz . '|' . $cot['id_cot'] . '" class="btn btn-outline-info btn-sm btn-circle shadow-gb informacion" title="Información"><span class="fas fa-info fa-lg"></span></a></div>';
+                                                                                                                    $color_est = 'cell-green';
+                                                                                                                    break;
+                                                                                                            }
+                                                                                                            ?>
+                                                                                                            <td class="<?php echo $color_est ?>">
+                                                                                                                <?php echo $estad ?>
+                                                                                                            </td>
+                                                                                                            <td><?php echo $btnDetalle ?></td>
+                                                                                                        </tr>
+                                                                                                    <?php
+                                                                                                    }
+                                                                                                    ?>
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        <?php
+                                                                                        } else {
+                                                                                        ?>
+                                                                                            <div class="p-3 mb-2 bg-warning text-white">NO HAY COTIZACIONES DISPONIBLES</div>
+                                                                                        <?php
+                                                                                        }
+                                                                                        ?>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!--parte-->
+                                                                            <div class="card">
+                                                                                <div class="card-header card-header-detalles py-0 headings" id="headingContrato">
+                                                                                    <h5 class="mb-0">
+                                                                                        <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseContrato" aria-expanded="true" aria-controls="collapseContrato">
+                                                                                            <div class="form-row">
+                                                                                                <div class="div-icono">
+                                                                                                    <span class="fas fa-file-signature fa-lg" style="color: #29B6F6;"></span>
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    2. CONTRATOS.
+                                                                                                </div>
+                                                                                                <?php
+                                                                                                //API URL
+                                                                                                $contra = $_SESSION['id_otro'] . '|' . $empresas[$key]['nit'];
+                                                                                                $url = $api . 'terceros/datos/res/listar/contratos/' . $contra;
+                                                                                                $ch = curl_init($url);
+                                                                                                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                                                                                                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                                                                                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                                                                                $result = curl_exec($ch);
+                                                                                                curl_close($ch);
+                                                                                                $contratos = json_decode($result, true);
+                                                                                                $num_contr = 0;
+                                                                                                if ($contratos != 0) {
+                                                                                                    foreach ($contratos as $ct) {
+                                                                                                        if ($ct['estado'] == 1) {
+                                                                                                            $num_contr++;
+                                                                                                        }
                                                                                                     }
                                                                                                 }
-                                                                                            }
-                                                                                            ?>
-                                                                                            <div class="ml-auto mr-0 mr-md-3 my-2 my-md-0 con-icon">
-                                                                                                <span class="fas fa-bell<?php echo $num_contr == 0 ? '-slash' : '' ?> fa-lg" style="color:<?php echo $num_contr == 0 ? '#D5D8DC' : '#5DADE2' ?> ;"></span>
-                                                                                                <?php if ($num_contr > 0) { ?>
-                                                                                                    <script type="text/javascript">
-                                                                                                        var newSpan = document.createElement("span");
-                                                                                                        newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
-                                                                                                        newSpan.style.color = 'orange';
-                                                                                                        newSpan.setAttribute('title', 'Nuevos contratos');
-                                                                                                        var contenedor = document.getElementById("notif_gral");
-                                                                                                        contenedor.appendChild(newSpan);
-                                                                                                    </script>
-                                                                                                    <script type="text/javascript">
-                                                                                                        var newSpan = document.createElement("span");
-                                                                                                        newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
-                                                                                                        newSpan.style.color = 'orange';
-                                                                                                        newSpan.setAttribute('title', 'Nuevos contratos');
-                                                                                                        var contenedor = document.getElementById("notif_cot");
-                                                                                                        contenedor.appendChild(newSpan);
-                                                                                                    </script>
-                                                                                                    <div class="txt-over">
-                                                                                                        <?php echo $num_contr > 99 ? '99+' : $num_contr ?>
-                                                                                                    </div>
-                                                                                                <?php } ?>
+                                                                                                ?>
+                                                                                                <div class="ml-auto mr-0 mr-md-3 my-2 my-md-0 con-icon">
+                                                                                                    <span class="fas fa-bell<?php echo $num_contr == 0 ? '-slash' : '' ?> fa-lg" style="color:<?php echo $num_contr == 0 ? '#D5D8DC' : '#5DADE2' ?> ;"></span>
+                                                                                                    <?php if ($num_contr > 0) { ?>
+                                                                                                        <script type="text/javascript">
+                                                                                                            var newSpan = document.createElement("span");
+                                                                                                            newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
+                                                                                                            newSpan.style.color = 'orange';
+                                                                                                            newSpan.setAttribute('title', 'Nuevos contratos');
+                                                                                                            var contenedor = document.getElementById("notif_gral");
+                                                                                                            contenedor.appendChild(newSpan);
+                                                                                                        </script>
+                                                                                                        <script type="text/javascript">
+                                                                                                            var newSpan = document.createElement("span");
+                                                                                                            newSpan.classList.add('fas', 'fa-circle', 'fa-xs');
+                                                                                                            newSpan.style.color = 'orange';
+                                                                                                            newSpan.setAttribute('title', 'Nuevos contratos');
+                                                                                                            var contenedor = document.getElementById("notif_cot");
+                                                                                                            contenedor.appendChild(newSpan);
+                                                                                                        </script>
+                                                                                                        <div class="txt-over">
+                                                                                                            <?php echo $num_contr > 99 ? '99+' : $num_contr ?>
+                                                                                                        </div>
+                                                                                                    <?php } ?>
+                                                                                                </div>
                                                                                             </div>
-                                                                                        </div>
-                                                                                    </a>
-                                                                                </h5>
-                                                                            </div>
-                                                                            <div id="collapseContrato" class="collapse" aria-labelledby="headingContrato">
-                                                                                <div class="card-body">
-                                                                                    <?php
-                                                                                    if ($contratos != 0) {
-                                                                                    ?>
-                                                                                        <table class="table table-striped table-bordered table-sm nowrap table-hover shadow tableContratos" style="width:100%">
-                                                                                            <thead>
-                                                                                                <tr>
-                                                                                                    <th># Contrato</th>
-                                                                                                    <th># Cotización</th>
-                                                                                                    <th>Descripción</th>
-                                                                                                    <th>Estado</th>
-                                                                                                    <th>Contrato</th>
-                                                                                                    <th>Acciones</th>
-                                                                                                </tr>
-                                                                                            </thead>
-                                                                                            <tbody class="modificarContratos">
-                                                                                                <?php
-                                                                                                foreach ($contratos as $ct) {
-                                                                                                ?>
+                                                                                        </a>
+                                                                                    </h5>
+                                                                                </div>
+                                                                                <div id="collapseContrato" class="collapse" aria-labelledby="headingContrato">
+                                                                                    <div class="card-body">
+                                                                                        <?php
+                                                                                        if ($contratos != 0) {
+                                                                                        ?>
+                                                                                            <table class="table table-striped table-bordered table-sm nowrap table-hover shadow tableContratos" style="width:100%">
+                                                                                                <thead>
                                                                                                     <tr>
-                                                                                                        <td>CC-<?php echo $ct['id_contrato'] ?></td>
-                                                                                                        <td>COT-<?php echo $ct['id_compra'] ?></td>
-                                                                                                        <td><?php echo $ct['objeto'] ?></td>
-                                                                                                        <?php
-                                                                                                        $btnDetalle = null;
-                                                                                                        $estad = 0;
-                                                                                                        $color_est = '';
-                                                                                                        switch ($ct['estado']) {
-                                                                                                            case 1:
-                                                                                                                $estad = 'RECIBIDO';
-                                                                                                                $btnDetalle = '<div class="center-block"><a value="' . $ct['id_c'] . '" class="btn btn-outline-success btn-sm btn-circle shadow-gb enviar" title="Enviar Contrato"><span class="fas fa-share-square fa-lg"></span></a></div>';
-                                                                                                                $color_est = 'cell-orange';
-                                                                                                                break;
-                                                                                                            case 2:
-                                                                                                                $estad = 'ENVIADO';
-                                                                                                                $btnDetalle = '<div class="center-block"><a value="' .  $ct['id_c'] . '" class="btn btn-outline-info btn-sm btn-circle shadow-gb informacion" title="Información"><span class="fas fa-info fa-lg"></span></a></div>';
-                                                                                                                $color_est = 'cell-green';
-                                                                                                                break;
-                                                                                                        }
-                                                                                                        ?>
-                                                                                                        <td class="<?php echo $color_est ?>">
-                                                                                                            <?php echo $estad ?>
-                                                                                                        </td>
-                                                                                                        <td>
-                                                                                                            <div class="center-block">
-                                                                                                                <a value="<?php echo  $ct['id_c'] . '|' . $ct['id_contrato'] ?>" class="btn btn-outline-danger btn-sm btn-circle shadow-gb descargar" title="Descargar contrato">
-                                                                                                                    <span class="fas fa-file-pdf fa-lg"></span>
-                                                                                                                </a>
-                                                                                                            </div>
-                                                                                                        </td>
-                                                                                                        <td><?php echo $btnDetalle ?></td>
+                                                                                                        <th># Contrato</th>
+                                                                                                        <th># Cotización</th>
+                                                                                                        <th>Descripción</th>
+                                                                                                        <th>Estado</th>
+                                                                                                        <th>Contrato</th>
+                                                                                                        <th>Acciones</th>
                                                                                                     </tr>
-                                                                                                <?php
-                                                                                                }
-                                                                                                ?>
-                                                                                            </tbody>
-                                                                                        </table>
-                                                                                    <?php
-                                                                                    } else {
-                                                                                    ?>
-                                                                                        <div class="p-3 mb-2 bg-warning text-white">NO HAY CONTRATOS DISPONIBLES</div>
-                                                                                    <?php
-                                                                                    }
-                                                                                    ?>
+                                                                                                </thead>
+                                                                                                <tbody class="modificarContratos">
+                                                                                                    <?php
+                                                                                                    foreach ($contratos as $ct) {
+                                                                                                    ?>
+                                                                                                        <tr>
+                                                                                                            <td>CC-<?php echo $ct['id_contrato'] ?></td>
+                                                                                                            <td>COT-<?php echo $ct['id_compra'] ?></td>
+                                                                                                            <td><?php echo $ct['objeto'] ?></td>
+                                                                                                            <?php
+                                                                                                            $btnDetalle = null;
+                                                                                                            $estad = 0;
+                                                                                                            $color_est = '';
+                                                                                                            switch ($ct['estado']) {
+                                                                                                                case 1:
+                                                                                                                    $estad = 'RECIBIDO';
+                                                                                                                    $btnDetalle = '<div class="center-block"><a value="' . $ct['id_c'] . '" class="btn btn-outline-success btn-sm btn-circle shadow-gb enviar" title="Enviar Contrato"><span class="fas fa-share-square fa-lg"></span></a></div>';
+                                                                                                                    $color_est = 'cell-orange';
+                                                                                                                    break;
+                                                                                                                case 2:
+                                                                                                                    $estad = 'ENVIADO';
+                                                                                                                    $btnDetalle = '<div class="center-block"><a value="' .  $ct['id_c'] . '" class="btn btn-outline-info btn-sm btn-circle shadow-gb informacion" title="Información"><span class="fas fa-info fa-lg"></span></a></div>';
+                                                                                                                    $color_est = 'cell-green';
+                                                                                                                    break;
+                                                                                                            }
+                                                                                                            ?>
+                                                                                                            <td class="<?php echo $color_est ?>">
+                                                                                                                <?php echo $estad ?>
+                                                                                                            </td>
+                                                                                                            <td>
+                                                                                                                <div class="center-block">
+                                                                                                                    <a value="<?php echo  $ct['id_c'] . '|' . $ct['id_contrato'] ?>" class="btn btn-outline-danger btn-sm btn-circle shadow-gb descargar" title="Descargar contrato">
+                                                                                                                        <span class="fas fa-file-pdf fa-lg"></span>
+                                                                                                                    </a>
+                                                                                                                </div>
+                                                                                                            </td>
+                                                                                                            <td><?php echo $btnDetalle ?></td>
+                                                                                                        </tr>
+                                                                                                    <?php
+                                                                                                    }
+                                                                                                    ?>
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        <?php
+                                                                                        } else {
+                                                                                        ?>
+                                                                                            <div class="p-3 mb-2 bg-warning text-white">NO HAY CONTRATOS DISPONIBLES</div>
+                                                                                        <?php
+                                                                                        }
+                                                                                        ?>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    <?php
-                                                    } else { ?>
-                                                        <div class="p-3 mb-2 bg-warning text-white">AUN NO POSEÉ VÍNCULO CON NINGUNA EMPRESA</div>
-                                                    <?php
-                                                    }
-                                                    ?>
+                                                        <?php
+                                                        } else { ?>
+                                                            <div class="p-3 mb-2 bg-warning text-white">AUN NO POSEÉ VÍNCULO CON NINGUNA EMPRESA</div>
+                                                        <?php
+                                                        }
+                                                        ?>
 
                                                 <?php
+                                                    }
                                                 }
                                                 ?>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <!-- parte-->
+                                <?php
+                                if (!empty($contrato_supervisar)) {
+                                ?>
+                                    <div class="card">
+                                        <div class="card-header card-header-detalles py-0 headings" id="supervision">
+                                            <h5 class="mb-0">
+                                                <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseSupervision" aria-expanded="true" aria-controls="collapseAtcvEcon">
+                                                    <div class="form-row">
+                                                        <div class="div-icono">
+                                                            <span class="fas fa-user-secret fa-lg" style="color: #2C3E50;"></span>
+                                                        </div>
+                                                        <div>
+                                                            SUPERVISIÓN
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </h5>
+                                        </div>
+                                        <div id="collapseSupervision" class="collapse" aria-labelledby="supervision">
+                                            <div class="card-body">
+                                                <table id="tableSupervision" class="table table-striped table-bordered table-sm nowrap table-hover shadow" style="width:100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>NIT Empresa</th>
+                                                            <th>Nombre</th>
+                                                            <th>Contrato</th>
+                                                            <th>Fecha designado</th>
+                                                            <th>Observación</th>
+                                                            <th>Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="modificarSupervisiones">
+                                                        <?php
+                                                        foreach ($contrato_supervisar as $cs) {
+                                                            $key = array_search($cs['nit_empresa'], array_column($empresas, 'nit'));
+                                                            if (false !== $key) {
+                                                                $nit_empresa = $empresas[$key]['nit'] . '-' . $empresas[$key]['dig_ver'];
+                                                                $nom_empresa = $empresas[$key]['nombre'];
+                                                            } else {
+                                                                $nit_empresa = '';
+                                                                $nom_empresa = '';
+                                                            }
+                                                        ?>
+                                                            <tr>
+                                                                <td><?php echo $nit_empresa ?></td>
+                                                                <td><?php echo $nom_empresa ?></td>
+                                                                <td><?php echo 'CC-' . $cs['id_contrato'] ?></td>
+                                                                <td><?php echo $cs['fec_designacion'] ?></td>
+                                                                <td><?php echo $cs['observacion'] ?></td>
+                                                                <td><?php echo '<div class="center-block"><a value="' . $cs['contrato'] . '" class="btn btn-outline-warning btn-sm btn-circle shadow-gb detalle" title="Detalles"><span class="fas fa-eye fa-lg"></span></a></div>' ?></td>
+                                                            </tr>
+                                                        <?php
+                                                        } ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php } ?>
                                 <!-- parte-->
                                 <div class="card">
                                     <div class="card-header card-header-detalles py-0 headings" id="documentos">

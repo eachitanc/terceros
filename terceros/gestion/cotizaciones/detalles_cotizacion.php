@@ -23,13 +23,13 @@ $id_cot_tercero = $data[3];
 <html lang="es">
 <?php include '../../../set/head.php' ?>
 
-<body class="sb-nav-fixed">
+<body class="sb-nav-fixed sb-sidenav-toggled">
     <?php include '../../../set/navsuperior.php'; ?>
     <div id="layoutSidenav">
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid p-0">
-                    <div class="card mb-4">
+                    <div class="card mb-5 mb-4">
                         <div class="card-header" id="divTituloPag">
                             <div class="row">
                                 <div class="col-md-12">
