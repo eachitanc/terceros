@@ -26,6 +26,7 @@ if ($det_contrato != 0) {
         'estado' => '',
         'botones' => '',
     ];
+    $num = 3;
     foreach ($det_contrato['docs'] as $ds) {
         $num++;
         $id_doc = $ds['id_doc_c'];
@@ -38,13 +39,20 @@ if ($det_contrato != 0) {
             $estado = '<span class="fas fa-check-circle fa-lg shadow-gb rounded-circle" style="color:#2ECC71;" title="Aprobado"></span>';
             $editar = $borrar = null;
         } else if ($ds['estado'] == 1) {
-            $estado = '<span class="fas fa-times-circle fa-lg shadow-gb rounded-circle" style="color:#838383;" title="Pendiente Aprobación"></span></a>';
+            $estado = '<span class="fas fa-minus-circle fa-lg shadow-gb rounded-circle" style="color:#838383;" title="Pendiente Aprobación"></span></a>';
             $editar = '<a value="' . $id_doc . '" class="btn btn-outline-primary btn-sm btn-circle shadow-gb editar" title="Editar"><span class="fas fa-pencil-alt fa-lg"></span></a>';
             $borrar = '<a value="' . $id_doc . '" class="btn btn-outline-danger btn-sm btn-circle shadow-gb borrar" title="Eliminar"><span class="fas fa-trash-alt fa-lg"></span></a>';
         } else {
             $estado = '<span class="fas fa-times-circle fa-lg shadow-gb rounded-circle" style="color:#E74C3C;" title="Rechazado"></span></a>';
             $editar = '<a value="' . $id_doc . '" class="btn btn-outline-primary btn-sm btn-circle shadow-gb editar" title="Editar"><span class="fas fa-pencil-alt fa-lg"></span></a>';
             $borrar = '<a value="' . $id_doc . '" class="btn btn-outline-danger btn-sm btn-circle shadow-gb borrar" title="Eliminar"><span class="fas fa-trash-alt fa-lg"></span></a>';
+        }
+        if ($ds['id_tipo_doc'] == 98) {
+            $aux = $num;
+            $num = 2;
+            $estado = null;
+            $editar = null;
+            $borrar = null;
         }
         $ruta = base64_encode($ds['ruta_doc_c'] . $ds['nom_doc_c']);
         $data[] = [
@@ -54,6 +62,9 @@ if ($det_contrato != 0) {
             'estado' => '<div class="center-block">' . $estado . '</div>',
             'botones' => '<div class="center-block">' . $editar . $borrar . '</div>',
         ];
+        if ($ds['id_tipo_doc'] == 98) {
+            $num = $aux;
+        }
     }
 } else {
     $data = [];

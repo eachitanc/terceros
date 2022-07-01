@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user']) && !isset($_SESSION['otro'])) {
+if (!isset($_SESSION['otro'])) {
     echo '<script>window.location.replace("../../../index.php");</script>';
     exit();
 }
@@ -19,7 +19,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 $tercero = json_decode($result, true);
-if ($tercero['password'] === $actpass) {
+if ($tercero[0]['password'] === $actpass) {
     //API URL
     $url =$api.'terceros/datos/res/modificar/pass';
     $ch = curl_init($url);

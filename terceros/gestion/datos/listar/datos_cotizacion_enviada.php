@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user']) && !isset($_SESSION['otro'])) {
+if (!isset($_SESSION['otro'])) {
     echo '<script>window.location.replace("../../../../index.php");</script>';
     exit();
 }

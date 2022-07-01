@@ -945,8 +945,14 @@
                     cache: false,
                     success: function(r) {
                         if (r == 1) {
-                            let id = 'tableDocSopContrato';
-                            reloadtable(id);
+                            if ($('#tableDocSopContrato').length) {
+                                let id = 'tableDocSopContrato';
+                                reloadtable(id);
+                            }
+                            if ($('#tableDocsContratoSupervisar').length) {
+                                let id = 'tableDocsContratoSupervisar';
+                                reloadtable(id);
+                            }
                             $('#divModalForms').modal('hide');
                             $('#divModalDone').modal('show');
                             $('#divMsgDone').html('Documento de soporte adjuntado Correctamente');
@@ -1102,5 +1108,109 @@
             $("#divForms").html(he);
             $('#slcRespEcon').focus();
         });
+    });
+    $('.modificarContratos ').on('click', '.entregar', function() {
+        let id = $(this).attr('value');
+        $.post("datos/registrar/form_entregar_compra.php", { id: id }, function(he) {
+            $('#divTamModalForms').removeClass('modal-sm');
+            $('#divTamModalForms').removeClass('modal-lg');
+            $('#divTamModalForms').addClass('modal-xl');
+            $('#divModalForms').modal('show');
+            $("#divForms").html(he);
+        });
+        return false;
+    });
+    //Hacer entrega de productos
+    $('#divForms').on('click', '#btnEntregarCompra', function() {
+        var aprobar = 1;
+        $('input[type=number]').each(function() {
+            var min = parseInt($(this).attr('min'));
+            var max = parseInt($(this).attr('max'));
+            var val = $(this).val().length ? parseInt($(this).val()) : 'NO';
+            $(this).removeClass('border-danger');
+            if (val == 'NO') {
+                aprobar = 0;
+                $(this).focus();
+                $(this).addClass('border-danger');
+                $('#divModalError').modal('show');
+                $('#divMsgError').html('El valor debe estar entre ' + min + ' y ' + max + ' válido');
+            } else if (val < min || val > max) {
+                aprobar = 0;
+                $(this).focus();
+                $(this).addClass('border-danger');
+                $('#divModalError').modal('show');
+                $('#divMsgError').html('El valor debe estar entre ' + min + ' y ' + max);
+            }
+            if (aprobar == 0) {
+                return false;
+            }
+        });
+        if (aprobar == 1) {
+            $cantidades = $('#formCantEntrega').serialize();
+            $.ajax({
+                type: 'POST',
+                url: 'datos/actualizar/up_entregar_compra.php',
+                data: $cantidades,
+                success: function(r) {
+                    if (r == 1) {
+                        $('#divModalDone a').attr('data-dismiss', '');
+                        $('#divModalDone a').attr('href', 'javascript:location.reload()');
+                        $('#divModalForms').modal('hide');
+                        $('#divModalDone').modal('show');
+                        $('#divMsgDone').html("Entrega realizada correctamente");
+                    } else {
+                        $('#divModalError').modal('show');
+                        $('#divMsgError').html(r);
+                    }
+
+                }
+            });
+        }
+    });
+    //Generar certificado formulario 220
+    $('#btnCertificadoForm220').on('click', function() {
+        $.post("datos/listar/opciones_form220.php", function(he) {
+            $('#divTamModalForms').removeClass('modal-sm');
+            $('#divTamModalForms').removeClass('modal-xl');
+            $('#divTamModalForms').removeClass('modal-lg');
+            $('#divModalForms').modal('show');
+            $("#divForms").html(he);
+        });
+        return false;
+    });
+    //descargar certificado formulario 220
+    $('#divForms').on('click', '#btnDownCertifForm220', function() {
+        if ($('#slcEmpresa').val() == '0') {
+            $('#divModalError').modal('show');
+            $('#divMsgError').html('Seleccione una empresa');
+        } else if ($('#numAnioCertifica').val() == '' || parseInt($('#numAnioCertifica').val()) == 0) {
+            $('#divModalError').modal('show');
+            $('#divMsgError').html('Ingrese un año correcto');
+        } else if ($('#slcTipoCertificado').val() == '0') {
+            $('#divModalError').modal('show');
+            $('#divMsgError').html('Seleccione un tipo de certificado');
+        } else {
+            let datos = $('#formGenForm220').serialize();
+            $.ajax({
+                type: 'POST',
+                url: 'datos/listar/generar_ruta.php',
+                dataType: 'json',
+                data: datos,
+                success: function(r) {
+                    if (r.status == 1) {
+                        $('#divModalForms').modal('hide');
+                        $('#divModalConfDel').modal('show');
+                        $('#divMsgConfdel').html('Espere un momento, se está generando el certificado...');
+                        $('#divBtnsModalDel').html('<a type="button" class="btn btn-primary btn-sm btn-modal" data-dismiss="modal"> Aceptar</a>');
+                        let ruta = r.response;
+                        $('<form action="datos/descargas/descarga_certificado.php" method="post"><input type="hidden" name="ruta" value="' + ruta + '" /></form>').appendTo('body').submit();
+                    } else {
+                        $('#divModalError').modal('show');
+                        $('#divMsgError').html(r.response);
+                    }
+                }
+            });
+        }
+        return false;
     });
 })(jQuery);

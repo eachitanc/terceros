@@ -346,9 +346,9 @@ $contrato_supervisar = json_decode($result, true);
                                                                             </div>
                                                                             <!--parte-->
                                                                             <div class="card">
-                                                                                <div class="card-header card-header-detalles py-0 headings" id="headingContrato">
+                                                                                <div class="card-header card-header-detalles py-0 headings" id="headingContrato<?php echo $id_empresa ?>">
                                                                                     <h5 class="mb-0">
-                                                                                        <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseContrato" aria-expanded="true" aria-controls="collapseContrato">
+                                                                                        <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseContrato<?php echo $id_empresa ?>" aria-expanded="true" aria-controls="collapseContrato">
                                                                                             <div class="form-row">
                                                                                                 <div class="div-icono">
                                                                                                     <span class="fas fa-file-signature fa-lg" style="color: #29B6F6;"></span>
@@ -404,7 +404,7 @@ $contrato_supervisar = json_decode($result, true);
                                                                                         </a>
                                                                                     </h5>
                                                                                 </div>
-                                                                                <div id="collapseContrato" class="collapse" aria-labelledby="headingContrato">
+                                                                                <div id="collapseContrato<?php echo $id_empresa ?>" class="collapse" aria-labelledby="headingContrato<?php echo $id_empresa ?>">
                                                                                     <div class="card-body">
                                                                                         <?php
                                                                                         if ($contratos != 0) {
@@ -437,11 +437,19 @@ $contrato_supervisar = json_decode($result, true);
                                                                                                                     $estad = 'RECIBIDO';
                                                                                                                     $btnDetalle = '<div class="center-block"><a value="' . $ct['id_c'] . '" class="btn btn-outline-success btn-sm btn-circle shadow-gb enviar" title="Enviar Contrato"><span class="fas fa-share-square fa-lg"></span></a></div>';
                                                                                                                     $color_est = 'cell-orange';
+                                                                                                                    $entrega = null;
                                                                                                                     break;
                                                                                                                 case 2:
                                                                                                                     $estad = 'ENVIADO';
-                                                                                                                    $btnDetalle = '<div class="center-block"><a value="' .  $ct['id_c'] . '" class="btn btn-outline-info btn-sm btn-circle shadow-gb informacion" title="Información"><span class="fas fa-info fa-lg"></span></a></div>';
+                                                                                                                    $btnDetalle = '<a value="' .  $ct['id_c'] . '" class="btn btn-outline-info btn-sm btn-circle shadow-gb informacion" title="Información"><span class="fas fa-info fa-lg"></span></a>';
                                                                                                                     $color_est = 'cell-green';
+                                                                                                                    $entrega = '<a value="' . $contra . '|' .  $ct['id_compra'] . '" class="btn btn-outline-warning btn-sm btn-circle shadow-gb entregar white" title="Entregar"><span class="fas fa-truck fa-lg"></span></a>';
+                                                                                                                    break;
+                                                                                                                case 3:
+                                                                                                                    $estad = 'ENTREGADO';
+                                                                                                                    $btnDetalle = '<a value="' .  $ct['id_c'] . '" class="btn btn-outline-info btn-sm btn-circle shadow-gb informacion" title="Información"><span class="fas fa-info fa-lg"></span></a>';
+                                                                                                                    $color_est = 'cell-blue';
+                                                                                                                    $entrega = '<a value="' . $contra . '|' .  $ct['id_compra'] . '" class="btn btn-outline-success btn-sm btn-circle shadow-gb entregar white" title="Entregado"><span class="fas fa-truck fa-lg"></span></a>';
                                                                                                                     break;
                                                                                                             }
                                                                                                             ?>
@@ -455,7 +463,7 @@ $contrato_supervisar = json_decode($result, true);
                                                                                                                     </a>
                                                                                                                 </div>
                                                                                                             </td>
-                                                                                                            <td><?php echo $btnDetalle ?></td>
+                                                                                                            <td><?php echo '<div class="center-block">' . $btnDetalle . $entrega . '</div>' ?></td>
                                                                                                         </tr>
                                                                                                     <?php
                                                                                                     }
@@ -666,6 +674,28 @@ $contrato_supervisar = json_decode($result, true);
                                                 <tbody id="modificarActvEcons">
                                                 </tbody>
                                             </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- parte-->
+                                <div class="card">
+                                    <div class="card-header card-header-detalles py-0 headings" id="certificados">
+                                        <h5 class="mb-0">
+                                            <a class="btn btn-link-acordeon collapsed" data-toggle="collapse" data-target="#collapseCertifica" aria-expanded="true" aria-controls="collapseAtcvEcon">
+                                                <div class="form-row">
+                                                    <div class="div-icono">
+                                                        <span class="fas fa-certificate fa-lg" style="color: #F4D03F;"></span>
+                                                    </div>
+                                                    <div>
+                                                        CERTIFICADOS
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </h5>
+                                    </div>
+                                    <div id="collapseCertifica" class="collapse" aria-labelledby="actividad">
+                                        <div class="card-body">
+                                            <button id="btnCertificadoForm220" class="btn btn-outline-success btn-sm">Form <span class="badge badge-info">220</span></button>
                                         </div>
                                     </div>
                                 </div>

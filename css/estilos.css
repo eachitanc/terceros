@@ -236,6 +236,10 @@ tfoot {
     color: #2ECC71;
 }
 
+.white:hover {
+    color: white;
+}
+
 .headings:hover {
     background-color: #48C9B0 !important;
 }
